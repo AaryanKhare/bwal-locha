@@ -5,7 +5,8 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullname, email, username, password } = req.body
+    const { fullname, email, username, password } = req.body;
+
     //TODO
     if (
         [fullname, username, email, password].some((field) => field?.trim() == "")
@@ -15,10 +16,11 @@ const registerUser = asyncHandler(async (req, res) => {
     const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
+
     if (existedUser) {
         throw new ApiError(409, "user already exists");
     }
-    console.warn(req.files);
+
     const avatarLocalPath = req.files?.avatar[0]?.path;
     const coverLocalPath = req.files?.coverImage[0]?.path;
 
@@ -53,7 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     try {
         const user = await User.create({
-            fullName,
+            fullname,
             avatar: avatar.url,
             coverImage: coverImage?.url || "",
             email,
@@ -77,7 +79,8 @@ const registerUser = asyncHandler(async (req, res) => {
         }
         if (coverImage) {
             await deleteFromCloudinary(coverImage.public_id)
-        }
+        }       
+
         throw new ApiError(500, "something went wrong while registering user")
     }
 })
